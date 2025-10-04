@@ -3,7 +3,7 @@ name: CI/CD for CarPricePredictor
 on:
   push:
     branches:
-      - main # trigger on push to main branch
+      - master # trigger on push to master branch
   pull_request:
 
 jobs:
