@@ -56,7 +56,7 @@ if __name__ == "__main__":
     import sys
     
     print("Running Model Tests...\n")
-    
+
     test1_passed = test_model_input()
     test2_passed = test_model_output_shape()
     
