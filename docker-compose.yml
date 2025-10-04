@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  car-dash-app:
+    build: .
+    ports:
+      - "8050:8050"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow.ml.brain.cs.ait.ac.th/
+      - MLFLOW_MODEL_URI=models:/st126438-a3-model/Production
+    volumes:
+      - .:/app
+    restart: unless-stopped
