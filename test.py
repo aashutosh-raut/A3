@@ -21,6 +21,10 @@ sample_df = pd.DataFrame([{
     'owner': 1,
 }])
 
+for col in ['fuel', 'seller_type', 'transmission']:
+	if col in sample_df:
+		sample_df[col] = sample_df[col].astype(int)
+          
 def test_model_input():
     """Test that the model accepts correct input format"""
     
