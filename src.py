@@ -110,3 +110,13 @@ class CarPricePredictor:
     def predict(self, X_raw):
         X_processed = self.preprocess(X_raw)
         return np.argmax(self.model._predict(X_processed), axis=1)
+    
+
+
+class CarPriceWrapper(mlflow.pyfunc.PythonModel):
+    def __init__(self, predictor):
+        self.predictor = predictor
+
+    def predict(self, context, model_input):
+        # Make sure it works with DataFrames or Series
+        return self.predictor.predict(model_input)
