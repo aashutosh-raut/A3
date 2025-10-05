@@ -18,11 +18,7 @@ mlflow.set_experiment("st126438-a3")
 
 model_name = "st126438-A3-model"
 
-try:
-    model = mlflow.pyfunc.load_model(f"models:/{model_name}/latest")
-except Exception as e:
-    print(" Failed to load model:", e)
-    model = None
+
 
 # ─── Default sample values ──────────────────────────────────
 sample = {
@@ -53,12 +49,12 @@ app.layout = html.Div(
         html.Label("Car Brand Name:", style={"fontWeight": "bold"}),
         dcc.Dropdown(
             id="brand",
-            options=[{"label": name, "value": i} for i, name in enumerate([
+            options=[{"label": name, "value": name} for name in [
                 "Ambassador","Ashok","Audi","BMW","Chevrolet","Daewoo","Datsun","Fiat","Force",
                 "Ford","Honda","Hyundai","Isuzu","Jaguar","Jeep","Kia","Land","Lexus","MG",
                 "Mahindra","Maruti","Mercedes-Benz","Mitsubishi","Nissan","Opel","Peugeot",
                 "Renault","Skoda","Tata","Toyota","Volkswagen","Volvo"
-            ])],
+            ]],
             value=sample['brand'],
             style={"width": "300px", "margin-bottom": "10px"}
         ),
@@ -69,10 +65,10 @@ app.layout = html.Div(
 
         html.Label("Fuel Type:", style={"fontWeight": "bold"}),
         dcc.Dropdown(
-            id="fuel_type",
+            id="fuel",
             options=[
-                {"label": "Petrol", "value": 0},
-                {"label": "Diesel", "value": 1},
+                {"label": "Petrol", "value": "Petrol"},
+                {"label": "Diesel", "value": "Diesel"},
             ],
             value=sample['fuel'],
             style={"width": "200px", "margin-bottom": "10px"}
@@ -82,9 +78,9 @@ app.layout = html.Div(
         dcc.Dropdown(
             id="seller_type",
             options=[
-                {"label": "Dealer", "value": 0},
-                {"label": "Individual", "value": 1},
-                {"label": "Trustmark Dealer", "value": 2},
+                {"label": "Dealer", "value": "Dealer"},
+                {"label": "Individual", "value": "Individual"},
+                {"label": "Trustmark Dealer", "value": "Trustmark Dealer"},
             ],
             value=sample['seller_type'],
             style={"width": "200px", "margin-bottom": "10px"}
@@ -93,10 +89,10 @@ app.layout = html.Div(
 
         html.Label("Transmission Type:", style={"fontWeight": "bold"}),
         dcc.Dropdown(
-            id="transmission_type",
+            id="transmission",
             options=[
-                {"label": "Automatic", "value": 0},
-                {"label": "Manual", "value": 1},
+                {"label": "Automatic", "value": "Automatic"},
+                {"label": "Manual", "value": "Manual"},
             ],
             value=sample['transmission'],
             style={"width": "200px", "margin-bottom": "10px"}
@@ -112,9 +108,9 @@ app.layout = html.Div(
         html.Br(),
 
         html.Label("Owner Type (1=First, 2=Second, 3=Third, 4=Fourth, 5=More):", style={"fontWeight": "bold"}),
-        dcc.Input(id='owner_type', type='number', value=sample['owner'], style={"margin-bottom": "10px"}),
+        dcc.Input(id='owner', type='number', value=sample['owner'], style={"margin-bottom": "10px"}),
         html.Br(),
-
+ 
         html.Label("Seats:", style={"fontWeight": "bold"}), dcc.Input(id='seats', type='number', value=sample['seats']),
         html.Br(),
 
@@ -136,17 +132,23 @@ app.layout = html.Div(
     Input('predict-btn', 'n_clicks'),
     State('brand', 'value'),
     State('km_driven', 'value'),
-    State('fuel_type', 'value'),
+    State('fuel', 'value'),
     State('seller_type', 'value'),
-    State('transmission_type', 'value'),
+    State('transmission', 'value'),
     State('year', 'value'),
     State('mileage', 'value'),
     State('engine', 'value'),
-    State('owner_type', 'value'),
+    State('owner', 'value'),
     State('seats', 'value'),
     State('max_power', 'value')
 )
-def predict(n_clicks, brand, km_driven, fuel_type, seller_type, transmission_type, year, mileage, engine, owner_type, seats, max_power):
+def predict(n_clicks, brand, km_driven, fuel, seller_type, transmission, year, mileage, engine, owner, seats, max_power):
+
+    try:
+        model = mlflow.pyfunc.load_model(f"models:/{model_name}/latest")
+    except Exception as e:
+        print(" Failed to load model:", e)
+        model = None
     if n_clicks == 0:
         return "No prediction yet."
     if model is None:
@@ -155,13 +157,13 @@ def predict(n_clicks, brand, km_driven, fuel_type, seller_type, transmission_typ
     input_df = pd.DataFrame([{
         'brand': brand,
         'km_driven': km_driven,
-        'fuel_type': fuel_type,
+        'fuel': fuel,
         'seller_type': seller_type,
-        'transmission_type': transmission_type,
+        'transmission': transmission,
         'year': year,
         'mileage': mileage,
         'engine': engine,
-        'owner_type': owner_type,
+        'owner': owner,
         'seats': seats,
         'max_power': max_power
     }])
@@ -170,7 +172,8 @@ def predict(n_clicks, brand, km_driven, fuel_type, seller_type, transmission_typ
         prediction = model.predict(input_df)
         return f"Predicted Price Class: {prediction[0]}"
     except Exception as e:
-        return f"Prediction failed: {e}"
+        print(f" Prediction failed for {input_df}:", e)
+        return f" Prediction failed for {input_df}: {e}"
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=8050)
@@ -244,7 +247,7 @@ if __name__ == "__main__":
 
 #     html.Label("Fuel Type:", style={"fontWeight": "bold"}),
 #     dcc.Dropdown(
-#         id="fuel_type",
+#         id="fuel",
 #         options=[
 #             {"label": "Petrol", "value": 0},
 #             {"label": "Diesel", "value": 1},
@@ -268,7 +271,7 @@ if __name__ == "__main__":
 
 #     html.Label("Transmission Type:", style={"fontWeight": "bold"}),
 #     dcc.Dropdown(
-#         id="transmission_type",
+#         id="transmission",
 #         options=[
 #             {"label": "Automatic", "value": 0},
 #             {"label": "Manual", "value": 1},
@@ -287,7 +290,7 @@ if __name__ == "__main__":
 #     dcc.Input(id='engine', type='number', value=sample['engine'].iloc[0], style={"margin-bottom": "10px"}),
 
 #     html.Label("Owner Type (1=First, 2=Second, 3=Third, 4=Fourth, 5=More):", style={"fontWeight": "bold"}),
-#     dcc.Input(id='owner_type', type='number', value=sample['owner'].iloc[0], style={"margin-bottom": "10px"}),
+#     dcc.Input(id='owner', type='number', value=sample['owner'].iloc[0], style={"margin-bottom": "10px"}),
 
 #     html.Label("Seats:", style={"fontWeight": "bold"}),
 #     dcc.Input(id='seats', type='number', value=sample['seats'].iloc[0], style={"margin-bottom": "10px"}),
@@ -310,17 +313,17 @@ if __name__ == "__main__":
 #     Input('predict-btn', 'n_clicks'),
 #     State('brand', 'value'),
 #     State('km_driven', 'value'),
-#     State('fuel_type', 'value'),
+#     State('fuel', 'value'),
 #     State('seller_type', 'value'),
-#     State('transmission_type', 'value'),
+#     State('transmission', 'value'),
 #     State('year', 'value'),
 #     State('mileage', 'value'),
 #     State('engine', 'value'),
-#     State('owner_type', 'value'),
+#     State('owner', 'value'),
 #     State('seats', 'value'),
 #     State('max_power', 'value'),
 # )
-# def predict(n_clicks, brand, km_driven, fuel_type, seller_type, transmission_type, year, mileage, engine, owner_type, seats, max_power):
+# def predict(n_clicks, brand, km_driven, fuel, seller_type, transmission, year, mileage, engine, owner, seats, max_power):
 #     if n_clicks == 0:
 #         return "No prediction yet."
 #     if model is None:
@@ -329,13 +332,13 @@ if __name__ == "__main__":
 #     input_df = pd.DataFrame([{
 #         'brand': brand,
 #         'km_driven': km_driven,
-#         'fuel_type': fuel_type,
+#         'fuel': fuel,
 #         'seller_type': seller_type,
-#         'transmission_type': transmission_type,
+#         'transmission': transmission,
 #         'year': year,
 #         'mileage': mileage,
 #         'engine': engine,
-#         'owner_type': owner_type,
+#         'owner': owner,
 #         'seats': seats,
 #         'max_power': max_power
 #     }])
