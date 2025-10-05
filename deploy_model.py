@@ -30,6 +30,11 @@ sample_df = pd.DataFrame([{
     'owner': 1,
 }])
 
+for col in ['fuel', 'seller_type', 'transmission']:
+	if col in sample_df:
+		sample_df[col] = sample_df[col].astype(int)
+          
+
 mlflow.set_tracking_uri("https://mlflow.ml.brain.cs.ait.ac.th/") 
 mlflow.set_experiment(experiment_name="st126438-A3")
 

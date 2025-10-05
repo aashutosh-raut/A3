@@ -8,22 +8,18 @@ MODEL_URI = "model/st126438-a3-model.pkl"
 loaded_model = joblib.load(MODEL_URI)
 
 sample_df = pd.DataFrame([{
-    'brand': 20,
+    'brand': 'BMW',
     'km_driven': 772,
-    'fuel': '0',
-    'seller_type': '1',
-    'mileage': 25.4,
-    'engine': 1200.0,
-    'max_power': 84.0,
-    'year': 21,
-    'seats': 2.0,
-    'transmission': '1',
+    'fuel': 'Diesel',
+    'seller_type': 'Trustmark Dealer',
+    'mileage': 240.4,
+    'engine': 12.0,
+    'max_power': 8.0,
+    'year': 1999,
+    'seats': 4.0,
+    'transmission': 'Manual',
     'owner': 1,
 }])
-
-for col in ['fuel', 'seller_type', 'transmission']:
-	if col in sample_df:
-		sample_df[col] = sample_df[col].astype(int)
           
 def test_model_input():
     """Test that the model accepts correct input format"""

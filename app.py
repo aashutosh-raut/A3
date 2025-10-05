@@ -2,13 +2,19 @@ from dash import Dash, html, dcc, Input, Output, State, dash_table #importing th
 import pandas as pd
 import joblib
 import numpy as np
-
+import os
+import mlflow
 app = Dash() #initilising the app
 
 df = pd.read_csv("Cars.csv") # importing the dataset
 
 # filename = './model/st126438-a3-model.pkl' # importing the car_prediction model from the car prediction
 # loaded_model = joblib.load(filename) #loading the model
+os.environ["MLFLOW_TRACKING_USERNAME"] = "admin"
+os.environ["MLFLOW_TRACKING_PASSWORD"] = "password"
+mlflow.set_tracking_uri("http://mlflow.ml.brain.cs.ait.ac.th/")
+
+model = mlflow.pyfunc.load_model("models:/st126438-A3-model/latest")
 
 app.layout = html.Div(children=[ # initializing the app layout 
     html.Div([

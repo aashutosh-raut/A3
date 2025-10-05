@@ -5,10 +5,10 @@ import mlflow.pyfunc
 import os
 
 # Load model from MLflow
-
+mlflow.set_tracking_uri("http://mlflow.ml.brain.cs.ait.ac.th/")
 os.environ["MLFLOW_TRACKING_USERNAME"] = "admin"
 os.environ["MLFLOW_TRACKING_PASSWORD"] = "password"
-mlflow.set_tracking_uri("http://mlflow.ml.brain.cs.ait.ac.th/")
+
 
 model = mlflow.pyfunc.load_model("models:/st126438-A3-model/latest")
 
@@ -18,19 +18,20 @@ feature_names = [
     'max_power', 'year', 'seats', 'transmission', 'owner'
 ]
 
-default_values = {
-    'brand': 20,
+# Sample input defaults
+sample = pd.DataFrame([{
+    'brand': 'BMW',
     'km_driven': 772,
-    'fuel': '0',
-    'seller_type': '1',
-    'mileage': 25.4,
-    'engine': 1200.0,
-    'max_power': 84.0,
-    'year': 21,
-    'seats': 2.0,
-    'transmission': '1',
+    'fuel': 'Diesel',
+    'seller_type': 'Trustmark Dealer',
+    'mileage': 240.4,
+    'engine': 12.0,
+    'max_power': 8.0,
+    'year': 1999,
+    'seats': 4.0,
+    'transmission': 'Manual',
     'owner': 1,
-}
+}])
 
 app = Dash(__name__)
 
